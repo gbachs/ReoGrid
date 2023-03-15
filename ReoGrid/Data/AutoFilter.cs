@@ -72,8 +72,8 @@ namespace unvell.ReoGrid.Data
 
 //			if (endCol < startCol) throw new ArgumentOutOfRangeException("end number of column must be greater than start number of column");
 
-			this.Worksheet = worksheet;
-			this.ApplyRange = range;
+			Worksheet = worksheet;
+			ApplyRange = range;
 			//this.startCol = startCol;
 			//this.endCol = endCol;
 			//this.titleRows = titleRows;
@@ -88,8 +88,8 @@ namespace unvell.ReoGrid.Data
 		{
 			get
 			{
-				if (this.columnCollection == null) this.columnCollection = new FilterColumnCollection(this);
-				return this.columnCollection;
+				if (columnCollection == null) columnCollection = new FilterColumnCollection(this);
+				return columnCollection;
 			}
 		}
 
@@ -98,15 +98,15 @@ namespace unvell.ReoGrid.Data
 		/// </summary>
 		public void Apply()
 		{
-			if (this.Worksheet == null) return;
+			if (Worksheet == null) return;
 
 			//int endRow = this.Worksheet.MaxContentRow;
 
-			this.Worksheet.DoFilter(this.ApplyRange, r =>
+			Worksheet.DoFilter(ApplyRange, r =>
 			{
-				for (int c = this.ApplyRange.Col; c <= this.ApplyRange.EndCol;)
+				for (var c = ApplyRange.Col; c <= ApplyRange.EndCol;)
 				{
-					var columnHeader = this.Worksheet.RetrieveColumnHeader(c);
+					var columnHeader = Worksheet.RetrieveColumnHeader(c);
 					if (columnHeader == null) { c++; continue; }
 
 					var columnFilterBody = columnHeader.Body as AutoColumnFilterBody;
@@ -115,7 +115,7 @@ namespace unvell.ReoGrid.Data
 						c++; continue;
 					}
 
-					var cell = this.Worksheet.GetCell(r, c);
+					var cell = Worksheet.GetCell(r, c);
 					if (cell == null) { c++; continue; }
 
 					var text = cell.DisplayText;
@@ -157,11 +157,11 @@ namespace unvell.ReoGrid.Data
 			{
 				get
 				{
-					if (index < this.filter.ApplyRange.Col || index > this.filter.ApplyRange.EndCol
-						|| index < 0 || index >= this.filter.Worksheet.ColumnCount)
+					if (index < filter.ApplyRange.Col || index > filter.ApplyRange.EndCol
+						|| index < 0 || index >= filter.Worksheet.ColumnCount)
 						throw new ArgumentOutOfRangeException("index", "Number of column to find the filter out of the valid range");
 
-					return this.filter.Worksheet.RetrieveColumnHeader(index).Body as AutoColumnFilterBody;
+					return filter.Worksheet.RetrieveColumnHeader(index).Body as AutoColumnFilterBody;
 				}
 			}
 
@@ -174,16 +174,16 @@ namespace unvell.ReoGrid.Data
 			{
 				get
 				{
-					int index = RGUtility.GetNumberOfChar(columnCode);
+					var index = RGUtility.GetNumberOfChar(columnCode);
 					return this[index];
 				}
 			}
 
 			private IEnumerator<AutoColumnFilterBody> GetEnum()
 			{
-				for (int i = this.filter.ApplyRange.Col; i <= this.filter.ApplyRange.EndCol; i++)
+				for (var i = filter.ApplyRange.Col; i <= filter.ApplyRange.EndCol; i++)
 				{
-					var header = this.filter.Worksheet.RetrieveColumnHeader(i);
+					var header = filter.Worksheet.RetrieveColumnHeader(i);
 					if (header == null) continue;
 					var body = header.Body as AutoColumnFilterBody;
 					if (body == null) continue;
@@ -197,12 +197,12 @@ namespace unvell.ReoGrid.Data
 			/// <returns></returns>
 			public IEnumerator<AutoColumnFilterBody> GetEnumerator()
 			{
-				return this.GetEnum();
+				return GetEnum();
 			}
 
 			System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 			{
-				return this.GetEnum();
+				return GetEnum();
 			}
 		}
 		#endregion // FilterColumnCollection
@@ -212,7 +212,7 @@ namespace unvell.ReoGrid.Data
 		#endregion
 
 		#region AutoColumnFilterBody
-		public class AutoColumnFilterBody : unvell.ReoGrid.CellTypes.IHeaderBody
+		public class AutoColumnFilterBody : CellTypes.IHeaderBody
 		{
 			internal AutoColumnFilter autoFilter;
 
@@ -224,9 +224,9 @@ namespace unvell.ReoGrid.Data
 			internal AutoColumnFilterBody(AutoColumnFilter autoFilter, ColumnHeader header)
 			{
 				this.autoFilter = autoFilter;
-				this.ColumnHeader = header;
-				this.DataDirty = true;
-				this.IsSelectAll = true;
+				ColumnHeader = header;
+				DataDirty = true;
+				IsSelectAll = true;
 			}
 
 			internal bool IsDropdown { get; set; }
@@ -240,27 +240,27 @@ namespace unvell.ReoGrid.Data
 			{
 				var controlStyle = dc.Worksheet.controlAdapter.ControlStyle;
 
-				if (this.autoFilter.columnFilterUIFlag == AutoColumnFilterUI.DropdownButton
-					|| this.autoFilter.columnFilterUIFlag == AutoColumnFilterUI.DropdownButtonAndPanel)
+				if (autoFilter.columnFilterUIFlag == AutoColumnFilterUI.DropdownButton
+					|| autoFilter.columnFilterUIFlag == AutoColumnFilterUI.DropdownButtonAndPanel)
 				{
-					Rectangle bounds = GetColumnFilterButtonRect(headerSize);
+					var bounds = GetColumnFilterButtonRect(headerSize);
 
-					SolidColor color1 = controlStyle.GetColHeadStartColor(isHover: false, isInvalid: false,
+					var color1 = controlStyle.GetColHeadStartColor(isHover: false, isInvalid: false,
 						isSelected: IsDropdown, isFullSelected: false);
 
-					SolidColor color2 = controlStyle.GetColHeadEndColor(isHover: false, isInvalid: false,
+					var color2 = controlStyle.GetColHeadEndColor(isHover: false, isInvalid: false,
 						isSelected: IsDropdown, isFullSelected: false);
 
 					var g = dc.Graphics;
 
 					g.FillRectangleLinear(color1, color2, 90f, bounds);
 
-					g.DrawRectangle(bounds, unvell.ReoGrid.Rendering.StaticResources.SystemColor_ControlDark);
+					g.DrawRectangle(bounds, StaticResources.SystemColor_ControlDark);
 
-					unvell.Common.GraphicsToolkit.FillTriangle(dc.Graphics.PlatformGraphics, 
+					Common.GraphicsToolkit.FillTriangle(dc.Graphics.PlatformGraphics, 
 						Math.Min(7 * dc.Worksheet.renderScaleFactor, 7.0f),
 						new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2), 
-						unvell.Common.GraphicsToolkit.TriangleDirection.Down);
+						Common.GraphicsToolkit.TriangleDirection.Down);
 				}
 			}
 
@@ -272,17 +272,17 @@ namespace unvell.ReoGrid.Data
 			/// <returns>True if event has been handled; otherwise return false</returns>
 			public bool OnMouseDown(Size headerSize, Events.WorksheetMouseEventArgs e)
 			{
-				if (this.autoFilter == null
-					|| this.autoFilter.columnFilterUIFlag == AutoColumnFilterUI.NoGUI
-					|| this.ColumnHeader == null || this.ColumnHeader.Worksheet == null) return false;
+				if (autoFilter == null
+                    || autoFilter.columnFilterUIFlag == AutoColumnFilterUI.NoGUI
+                    || ColumnHeader?.Worksheet == null) return false;
 
 				if (IsMouseInButton(headerSize, e.RelativePosition))
 				{
-					return this.autoFilter.RaiseFilterButtonPress(this, e.AbsolutePosition);
+					return autoFilter.RaiseFilterButtonPress(this, e.AbsolutePosition);
 				}
-				else
-					return false;
-			}
+
+                return false;
+            }
 
 			/// <summary>
 			/// Handling mouse-move process
@@ -292,9 +292,9 @@ namespace unvell.ReoGrid.Data
 			/// <returns>True if event has been handled, otherwise return false</returns>
 			public bool OnMouseMove(Size headerSize, Events.WorksheetMouseEventArgs e)
 			{
-				if (this.autoFilter == null
-					|| this.autoFilter.columnFilterUIFlag == AutoColumnFilterUI.NoGUI
-					|| this.ColumnHeader == null || this.ColumnHeader.Worksheet == null) return false;
+				if (autoFilter == null
+                    || autoFilter.columnFilterUIFlag == AutoColumnFilterUI.NoGUI 
+                    || ColumnHeader?.Worksheet == null) return false;
 
 				if (IsMouseInButton(headerSize, e.RelativePosition))
 				{
@@ -307,18 +307,18 @@ namespace unvell.ReoGrid.Data
 
 			private bool IsMouseInButton(Size headerSize, Point position)
 			{
-				Rectangle bounds = GetColumnFilterButtonRect(headerSize);
+				var bounds = GetColumnFilterButtonRect(headerSize);
 				//Console.WriteLine(bounds.ToString() + " ---- " + position.ToString());
 				return bounds.Contains(position);
 			}
 
 			internal Rectangle GetColumnFilterButtonRect(Size size)
 			{
-				var sheet = this.ColumnHeader.Worksheet;
+				var sheet = ColumnHeader.Worksheet;
 
-				RGFloat scale = sheet.renderScaleFactor;
+				var scale = sheet.renderScaleFactor;
 
-				Rectangle bounds = new Rectangle(0, 0, Math.Min(Math.Min(size.Width - 2, 18f * scale), 20),
+				var bounds = new Rectangle(0, 0, Math.Min(Math.Min(size.Width - 2, 18f * scale), 20),
 					Math.Min(Math.Min(size.Height - 2, 18 * scale), 20));
 				bounds.X = size.Width - bounds.Width - 2;
 				bounds.Y = (size.Height - bounds.Height) / 2 - 1;
@@ -352,12 +352,12 @@ namespace unvell.ReoGrid.Data
 			{
 				get
 				{
-					if (this.textItemsCollection == null)
+					if (textItemsCollection == null)
 					{
-						this.textItemsCollection = new TextFilterCollection(this);
+						textItemsCollection = new TextFilterCollection(this);
 					}
 
-					return this.textItemsCollection;
+					return textItemsCollection;
 				}
 			}
 
@@ -371,7 +371,7 @@ namespace unvell.ReoGrid.Data
 
 				internal TextFilterCollection(AutoColumnFilterBody column)
 				{
-					this.columnFilter = column;
+					columnFilter = column;
 				}
 
 				/// <summary>
@@ -381,11 +381,8 @@ namespace unvell.ReoGrid.Data
 				/// <returns>True if item is selected by user; Otherwise return false;</returns>
 				public bool this[string item]
 				{
-					get
-					{
-						return columnFilter.selectedTextItems.Contains(item);
-					}
-					set
+					get => columnFilter.selectedTextItems.Contains(item);
+                    set
 					{
 						if (value)
 						{
@@ -418,10 +415,10 @@ namespace unvell.ReoGrid.Data
 				/// <param name="item">item to be added</param>
 				public void Add(string item)
 				{
-					if (!this.columnFilter.selectedTextItems.Contains(item))
+					if (!columnFilter.selectedTextItems.Contains(item))
 					{
-						this.columnFilter.selectedTextItems.Add(item);
-						this.columnFilter.IsSelectAll = false;
+						columnFilter.selectedTextItems.Add(item);
+						columnFilter.IsSelectAll = false;
 					}
 				}
 
@@ -430,7 +427,7 @@ namespace unvell.ReoGrid.Data
 				/// </summary>
 				public void Clear()
 				{
-					this.columnFilter.selectedTextItems.Clear();
+					columnFilter.selectedTextItems.Clear();
 					columnFilter.IsSelectAll = false;
 				}
 
@@ -441,7 +438,7 @@ namespace unvell.ReoGrid.Data
 				/// <returns>true if specified item has been contained in selected items, otherwise return false</returns>
 				public bool Contains(string item)
 				{
-					return this.columnFilter.selectedTextItems.Contains(item);
+					return columnFilter.selectedTextItems.Contains(item);
 				}
 
 				/// <summary>
@@ -451,34 +448,28 @@ namespace unvell.ReoGrid.Data
 				/// <param name="arrayIndex">number of element start to copy</param>
 				public void CopyTo(string[] array, int arrayIndex)
 				{
-					this.columnFilter.selectedTextItems.CopyTo(array, arrayIndex);
+					columnFilter.selectedTextItems.CopyTo(array, arrayIndex);
 				}
 
 				/// <summary>
 				/// Get number of selected items
 				/// </summary>
-				public int Count
-				{
-					get { return this.columnFilter.selectedTextItems.Count; }
-				}
+				public int Count => columnFilter.selectedTextItems.Count;
 
-				/// <summary>
+                /// <summary>
 				/// Check whether or not the collection of selection items is read-only
 				/// </summary>
-				public bool IsReadOnly
-				{
-					get { return false; }
-				}
+				public bool IsReadOnly => false;
 
-				/// <summary>
+                /// <summary>
 				/// Remove specified item from selected items
 				/// </summary>
 				/// <param name="item">item to be removed</param>
 				/// <returns>true if item exist and has been removed successfully</returns>
 				public bool Remove(string item)
 				{
-					this.columnFilter.IsSelectAll = false;
-					return this.columnFilter.selectedTextItems.Remove(item);
+					columnFilter.IsSelectAll = false;
+					return columnFilter.selectedTextItems.Remove(item);
 				}
 
 				/// <summary>
@@ -487,8 +478,8 @@ namespace unvell.ReoGrid.Data
 				/// <param name="items">list, array or other enumerable collection to be added</param>
 				public void AddRange(IEnumerable<string> items)
 				{
-					this.columnFilter.selectedTextItems.AddRange(items);
-					this.columnFilter.IsSelectAll = false;
+					columnFilter.selectedTextItems.AddRange(items);
+					columnFilter.IsSelectAll = false;
 				}
 			}
 			#endregion // TextFilterCollection
@@ -499,14 +490,13 @@ namespace unvell.ReoGrid.Data
 			/// <returns></returns>
 			public List<string> GetDistinctItems()
 			{
-				if (this.ColumnHeader == null || this.ColumnHeader.Worksheet == null) return null;
+				if (ColumnHeader?.Worksheet == null) return null;
 
-				List<string> items = new List<string>();
+				var items = new List<string>();
 
-				int maxRow = this.ColumnHeader.Worksheet.MaxContentRow;
+				var maxRow = ColumnHeader.Worksheet.MaxContentRow + 1;
 
-				this.ColumnHeader.Worksheet.IterateCells(this.autoFilter.ApplyRange.Row,
-					this.ColumnHeader.Index, this.autoFilter.ApplyRange.Rows, 1, true,
+				ColumnHeader.Worksheet.IterateCells(0, ColumnHeader.Index, maxRow, 1, true,
 					(r, c, cell) =>
 					{
 						var str = cell.DisplayText;
@@ -534,7 +524,7 @@ namespace unvell.ReoGrid.Data
 			/// <param name="endRow">zero-based number of last row that data has been changed</param>
 			public void OnDataChange(int startRow, int endRow)
 			{
-				this.DataDirty = true;
+				DataDirty = true;
 			}
 		}
 		#endregion // AutoColumnFilterBody
@@ -557,10 +547,10 @@ namespace unvell.ReoGrid.Data
 				if (arg.IsCancelled) return true;
 			}
 
-			if (this.columnFilterUIFlag == AutoColumnFilterUI.DropdownButtonAndPanel)
+			if (columnFilterUIFlag == AutoColumnFilterUI.DropdownButtonAndPanel)
 			{
 #if WINFORM
-				unvell.ReoGrid.WinForm.ColumnFilterContextMenu.ShowFilterPanel(headerBody, (System.Drawing.Point)point);
+				WinForm.ColumnFilterContextMenu.ShowFilterPanel(headerBody, (System.Drawing.Point)point);
 #elif WPF
 				var ctx = new System.Windows.Controls.ContextMenu();
 				ctx.Items.Add(new System.Windows.Controls.MenuItem() { Header = "Item" });
@@ -576,39 +566,36 @@ namespace unvell.ReoGrid.Data
 		{
 			try
 			{
-				this.Worksheet.ControlAdapter.ChangeCursor(CursorStyle.Busy);
+				Worksheet.ControlAdapter.ChangeCursor(CursorStyle.Busy);
 
-				for (int i = start; i <= end; i++)
+				for (var i = start; i <= end; i++)
 				{
-					var header = this.Worksheet.RetrieveColumnHeader(i);
+					var header = Worksheet.RetrieveColumnHeader(i);
 					header.Body = new AutoColumnFilterBody(this, header);
 				}
 			}
 			finally
 			{
-				this.Worksheet.ControlAdapter.ChangeCursor(CursorStyle.PlatformDefault);
+				Worksheet.ControlAdapter.ChangeCursor(CursorStyle.PlatformDefault);
 			}
 		}
 
 		private void RemoveFilterHeader(int start, int end)
 		{
-			if (this.Worksheet.cols.Count <= 0)
+			if (Worksheet.cols.Count <= 0)
 			{
 				return;
 			}
 
-			for (int i = start; i <= end; i++)
+			for (var i = start; i <= end; i++)
 			{
-				var header = this.Worksheet.RetrieveColumnHeader(i);
+				var header = Worksheet.RetrieveColumnHeader(i);
 				var body = header.Body as AutoColumnFilterBody;
 
 				if (body != null)
 				{
 #if WINFORM
-					if (body.ContextMenuStrip != null)
-					{
-						body.ContextMenuStrip.Dispose();
-					}
+                    body.ContextMenuStrip?.Dispose();
 #elif WPF
 						// todo
 #endif
@@ -630,10 +617,10 @@ namespace unvell.ReoGrid.Data
 				throw new ArgumentNullException("cannot attach to null worksheet", "worksheet");
 			}
 
-			this.Worksheet = worksheet;
-			this.columnFilterUIFlag = uiFlag;
+			Worksheet = worksheet;
+			columnFilterUIFlag = uiFlag;
 
-			CreateFilterHeaders(this.ApplyRange.Col, this.ApplyRange.EndCol);
+			CreateFilterHeaders(ApplyRange.Col, ApplyRange.EndCol);
 
 			worksheet.ColumnsInserted += worksheet_ColumnsInserted;
 		}
@@ -643,30 +630,30 @@ namespace unvell.ReoGrid.Data
 		/// </summary>
 		public void Detach()
 		{
-			if (this.Worksheet != null)
+			if (Worksheet != null)
 			{
-				this.Worksheet.ColumnsInserted -= worksheet_ColumnsInserted;
+				Worksheet.ColumnsInserted -= worksheet_ColumnsInserted;
 
-				this.Worksheet.ShowRows(this.ApplyRange.Row, this.ApplyRange.Rows);
+				Worksheet.ShowRows(ApplyRange.Row, ApplyRange.Rows);
 
-				RemoveFilterHeader(this.ApplyRange.Col, this.ApplyRange.EndCol);
+				RemoveFilterHeader(ApplyRange.Col, ApplyRange.EndCol);
 
-				this.Worksheet.RequestInvalidate();
-				this.Worksheet = null;
+				Worksheet.RequestInvalidate();
+				Worksheet = null;
 			}
 		}
 
 		void worksheet_ColumnsInserted(object sender, Events.ColumnsInsertedEventArgs e)
 		{
-			if (e.Index < this.ApplyRange.Col)
+			if (e.Index < ApplyRange.Col)
 			{
 				//RemoveFilterHeader(this.startCol, e.Index - 1);
-				this.ApplyRange.Offset(0, e.Count);
+				ApplyRange.Offset(0, e.Count);
 			}
-			else if (e.Index > this.ApplyRange.Col && e.Index <= this.ApplyRange.EndCol)
+			else if (e.Index > ApplyRange.Col && e.Index <= ApplyRange.EndCol)
 			{
-				this.CreateFilterHeaders(e.Index, e.Index + e.Count - 1);
-				this.ApplyRange.SetCols(this.ApplyRange.Cols + e.Count);
+				CreateFilterHeaders(e.Index, e.Index + e.Count - 1);
+				ApplyRange.SetCols(ApplyRange.Cols + e.Count);
 			}
 		}
 	}
@@ -715,7 +702,7 @@ namespace unvell.ReoGrid.Data
 		/// <param name="columnHeader"></param>
 		public FilterButtonPressedEventArgs(ColumnHeader columnHeader)
 		{
-			this.ColumnHeader = columnHeader;
+			ColumnHeader = columnHeader;
 		}
 	}
 }
