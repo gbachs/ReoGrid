@@ -134,7 +134,7 @@ namespace unvell.ReoGrid
 		#endregion
 
 		#region Workbook Relation
-		internal Workbook workbook;
+		public Workbook workbook;
 
 		/// <summary>
 		/// Instance of workbook of this worksheet
@@ -544,7 +544,7 @@ namespace unvell.ReoGrid
 		private static readonly float minScaleFactor = 0.1f;
 		private static readonly float maxScaleFactor = 4f;
 		private RGFloat _scaleFactor = 1f;
-		internal RGFloat renderScaleFactor = 1f;
+		public RGFloat renderScaleFactor = 1f;
 
 		/// <summary>
 		/// Get or set worksheet scale factor.

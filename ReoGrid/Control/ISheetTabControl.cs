@@ -128,10 +128,10 @@ namespace unvell.ReoGrid.Main
 		Bottom,
 	}
 
-	/// <summary>
-	/// Representes the sheet tab control interface.
-	/// </summary>
-	internal interface ISheetTabControl
+    /// <summary>
+    /// Representes the sheet tab control interface.
+    /// </summary>
+    public interface ISheetTabControl
 	{
 		///// <summary>
 		///// Get or set the border color.

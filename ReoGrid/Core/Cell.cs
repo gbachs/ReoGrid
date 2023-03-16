@@ -689,7 +689,7 @@ namespace unvell.ReoGrid
 
 #region Position
 
-		internal CellPosition InternalPos;
+		public CellPosition InternalPos;
 
 		internal int InternalRow
 		{

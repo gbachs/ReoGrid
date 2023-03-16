@@ -22,7 +22,7 @@ using System.Text;
 
 namespace unvell.ReoGrid.Views
 {
-	internal enum ViewTypes
+    public enum ViewTypes
 	{
 		None = 0x0,
 		Cells = 0x1,

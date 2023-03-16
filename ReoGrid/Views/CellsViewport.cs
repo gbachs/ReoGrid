@@ -50,7 +50,7 @@ using unvell.ReoGrid.Interaction;
 
 namespace unvell.ReoGrid.Views
 {
-	class CellsViewport : Viewport, IRangeSelectableView
+	public class CellsViewport : Viewport, IRangeSelectableView
 	{
 		public CellsViewport(IViewportController vc)
 			: base(vc)

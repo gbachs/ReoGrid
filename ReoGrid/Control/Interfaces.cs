@@ -64,7 +64,7 @@ namespace unvell.ReoGrid.Main
 {
 
 
-	internal enum ScrollDirection : byte
+    public enum ScrollDirection : byte
 	{
 		None = 0,
 		Horizontal = 1,
@@ -72,14 +72,14 @@ namespace unvell.ReoGrid.Main
 		Both = Horizontal | Vertical,
 	}
 
-	internal interface IRangePickableControl
+    public interface IRangePickableControl
 	{
 		void PickRange(Func<Worksheet, RangePosition, bool> handler);
 		void EndPickRange();
 		void StartPickRangeAndCopyStyle();
 	}
 
-	internal interface IContextMenuControl
+    public interface IContextMenuControl
 	{
 
 #if WINFORM
@@ -96,7 +96,7 @@ namespace unvell.ReoGrid.Main
 	}
 
 #if EX_SCRIPT
-	internal interface IScriptExecutableControl
+    public interface IScriptExecutableControl
 	{
 		string Script { get; set; }
 
@@ -106,7 +106,7 @@ namespace unvell.ReoGrid.Main
 	}
 #endif // EX_SCRIPT
 
-	internal interface IPersistenceWorkbook
+    public interface IPersistenceWorkbook
 	{
 		void Save(string path, FileFormat format = FileFormat._Auto, System.Text.Encoding encoding = null);
 		void Save(System.IO.Stream stream, FileFormat format = FileFormat._Auto, System.Text.Encoding encoding = null);
@@ -115,7 +115,7 @@ namespace unvell.ReoGrid.Main
 		void Load(System.IO.Stream stream, FileFormat format = FileFormat._Auto, System.Text.Encoding encoding = null);
 	}
 
-	internal interface IActionControl
+    public interface IActionControl
 	{
 		//unvell.Common.ActionManager ActionManager { get; }
 		void DoAction(Worksheet sheet, BaseWorksheetAction action);
@@ -132,12 +132,12 @@ namespace unvell.ReoGrid.Main
 		void ClearActionHistoryForWorksheet(Worksheet sheet);
 	}
 
-	internal interface IVisualWorkbook : IScrollableWorksheetContainer
+    public interface IVisualWorkbook : IScrollableWorksheetContainer
 	{
 		Worksheet CurrentWorksheet { get; set; }
 	}
 
-	internal interface IScrollableWorksheetContainer
+    public interface IScrollableWorksheetContainer
 	{
 		void RaiseWorksheetScrolledEvent(Worksheet worksheet, RGFloat x, RGFloat y);
 
@@ -145,7 +145,7 @@ namespace unvell.ReoGrid.Main
 		bool ShowScrollEndSpacing { get; }
 	}
 
-	internal interface IEditableControlAdapter
+    public interface IEditableControlAdapter
 	{
 		void ShowEditControl(Graphics.Rectangle bounds, Cell cell);
 		void HideEditControl();
@@ -168,7 +168,7 @@ namespace unvell.ReoGrid.Main
 		void EditControlUndo();
 	}
 
-	internal interface IScrollableControlAdapter
+    public interface IScrollableControlAdapter
 	{
 		//bool ScrollBarHorizontalVisible { get; set; }
 		//bool ScrollBarVerticalVisible { get; set; }
@@ -184,23 +184,23 @@ namespace unvell.ReoGrid.Main
 		RGIntDouble ScrollBarVerticalLargeChange { get; set; }
 	}
 
-	internal interface ITimerSupportedAdapter
+    public interface ITimerSupportedAdapter
 	{
 		void StartTimer();
 		void StopTimer();
 	}
 
-	internal interface IShowContextMenuAdapter
+    public interface IShowContextMenuAdapter
 	{
 		void ShowContextMenuStrip(ViewTypes viewType, Point containerLocation);
 	}
 
-	internal interface IMultisheetAdapter
+    public interface IMultisheetAdapter
 	{
 		ISheetTabControl SheetTabControl { get; }
 	}
 
-	internal interface ICompViewAdapter : IMultisheetAdapter
+    public interface ICompViewAdapter : IMultisheetAdapter
 	{
 		IVisualWorkbook ControlInstance { get; }
 		IRenderer Renderer { get; }
@@ -224,7 +224,7 @@ namespace unvell.ReoGrid.Main
 		void ShowTooltip(Point point, string content);
 	}
 
-	internal interface IControlAdapter : ICompViewAdapter, 
+    public interface IControlAdapter : ICompViewAdapter, 
 		IEditableControlAdapter, IScrollableControlAdapter, ITimerSupportedAdapter,
 		IShowContextMenuAdapter
 	{

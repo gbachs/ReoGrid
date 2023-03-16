@@ -47,12 +47,12 @@ namespace unvell.ReoGrid.Core
 	/// Cell horizontal alignment for render. (cell-auto-format)
 	/// </summary>
 	[Serializable]
-	internal enum ReoGridRenderHorAlign
+    public enum ReoGridRenderHorAlign
 	{
 		Left, Center, Right,
 	}
 
-	internal enum StyleParentKind : byte
+    public enum StyleParentKind : byte
 	{
 		Root,
 		Col,
@@ -61,7 +61,7 @@ namespace unvell.ReoGrid.Core
 		Own,
 	}
 
-	enum UpdateFontReason
+    public enum UpdateFontReason
 	{
 		FontChanged,
 		ScaleChanged,

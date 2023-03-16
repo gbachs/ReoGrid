@@ -41,7 +41,7 @@ using unvell.ReoGrid.Main;
 
 namespace unvell.ReoGrid.Views
 {
-	internal struct GridRegion
+    public struct GridRegion
 	{
 		internal int startRow;
 		internal int endRow;

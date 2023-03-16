@@ -41,7 +41,7 @@ using unvell.ReoGrid.Main;
 
 namespace unvell.ReoGrid.Views
 {
-	interface IViewport : IView
+    public interface IViewport : IView
 	{
 		Point ViewStart { get; set; }
 		RGFloat ViewTop { get; }

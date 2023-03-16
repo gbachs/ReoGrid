@@ -54,7 +54,7 @@ using ReoGridControl = unvell.ReoGrid.ReoGridView;
 
 namespace unvell.ReoGrid
 {
-	internal partial class Workbook : IWorkbook
+	public partial class Workbook : IWorkbook
 #if (WINFORM || WPF) && PRINT
 		, IPrintableContainer
 #endif // (WINFORM || WPF) && PRINT

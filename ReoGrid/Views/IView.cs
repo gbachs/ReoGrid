@@ -39,11 +39,11 @@ using unvell.ReoGrid.Main;
 namespace unvell.ReoGrid.Views
 {
 
-	/// <summary>
-	/// A view is a visual region which can be independent rendered on ReoGrid control.
-	/// A view can contains multiple child views.
-	/// </summary>
-	interface IView : IUserVisual
+    /// <summary>
+    /// A view is a visual region which can be independent rendered on ReoGrid control.
+    /// A view can contains multiple child views.
+    /// </summary>
+    public interface IView : IUserVisual
 	{
 		IViewportController ViewportController { get; set; }
 

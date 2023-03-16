@@ -105,7 +105,6 @@ namespace unvell.ReoGrid.Demo.CustomCells
 
 			// add click event handler
 			this.listView.Click += listView_Click;
-
 		}
 
 		void listView_Click(object sender, EventArgs e)

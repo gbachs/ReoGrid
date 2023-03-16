@@ -41,7 +41,7 @@ using unvell.ReoGrid.Main;
 
 namespace unvell.ReoGrid.Views
 {
-	internal interface IViewportController : IUserVisual, IVisualController
+    public interface IViewportController : IUserVisual, IVisualController
 	{
 		Worksheet Worksheet { get; }
 

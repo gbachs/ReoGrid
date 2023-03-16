@@ -42,7 +42,7 @@ using unvell.ReoGrid.Main;
 
 namespace unvell.ReoGrid.Views
 {
-	internal abstract class Viewport : View, IViewport
+    public abstract class Viewport : View, IViewport
 	{
 		protected Worksheet sheet;
 

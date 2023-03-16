@@ -65,7 +65,7 @@ namespace unvell.ReoGrid.Rendering
 	{
 	}
 
-	internal interface IRenderer : IGraphics
+    public interface IRenderer : IGraphics
 #if WINFORM
 		, System.IDisposable
 #endif // WINFORM

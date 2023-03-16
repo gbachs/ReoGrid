@@ -63,7 +63,7 @@ namespace unvell.ReoGrid
 		/// <summary>
 		/// Get or set viewport controller for worksheet.
 		/// </summary>
-		internal IViewportController ViewportController
+		public IViewportController ViewportController
 		{
 			get { return this.viewportController; }
 			set { this.viewportController = value; }

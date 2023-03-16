@@ -61,8 +61,8 @@ namespace unvell.ReoGrid
         public AutoColumnFilter CreateColumnFilter(string startColumn, string endColumn, int titleRows = 0,
             AutoColumnFilterUI columnFilterUI = AutoColumnFilterUI.DropdownButtonAndPanel)
         {
-            int startIndex = RGUtility.GetNumberOfChar(startColumn);
-            int endIndex = RGUtility.GetNumberOfChar(endColumn);
+            var startIndex = RGUtility.GetNumberOfChar(startColumn);
+            var endIndex = RGUtility.GetNumberOfChar(endColumn);
 
             return CreateColumnFilter(startIndex, endIndex, titleRows, columnFilterUI);
         }
@@ -79,7 +79,7 @@ namespace unvell.ReoGrid
         /// <returns>Instance of column filter.</returns>
         public AutoColumnFilter CreateColumnFilter(int column, int titleRows, AutoColumnFilterUI columnFilterUI)
         {
-            return this.CreateColumnFilter(column, column, titleRows, columnFilterUI);
+            return CreateColumnFilter(column, column, titleRows, columnFilterUI);
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace unvell.ReoGrid
         public AutoColumnFilter CreateColumnFilter(int startColumn, int endColumn, int titleRows = 0,
             AutoColumnFilterUI columnFilterUI = AutoColumnFilterUI.DropdownButtonAndPanel)
         {
-            if (startColumn < 0 || startColumn >= this.ColumnCount)
+            if (startColumn < 0 || startColumn >= ColumnCount)
             {
                 throw new ArgumentOutOfRangeException("startColumn", "number of column start to filter out of valid spreadsheet range");
             }
@@ -106,13 +106,13 @@ namespace unvell.ReoGrid
                 throw new ArgumentOutOfRangeException("endColumn", "end column must be greater than start column");
             }
 
-            if (endColumn >= this.ColumnCount)
+            if (endColumn >= ColumnCount)
             {
                 throw new ArgumentOutOfRangeException("endColumn", "end column out of valid spreadsheet range");
             }
 
             return CreateColumnFilter(new RangePosition(titleRows, startColumn,
-                this.MaxContentRow - titleRows + 1, endColumn - startColumn + 1), columnFilterUI);
+                MaxContentRow - titleRows + 1, endColumn - startColumn + 1), columnFilterUI);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace unvell.ReoGrid
         public AutoColumnFilter CreateColumnFilter(RangePosition range,
             AutoColumnFilterUI columnFilterUI = AutoColumnFilterUI.DropdownButtonAndPanel)
         {
-            var filter = new AutoColumnFilter(this, this.FixRange(range));
+            var filter = new AutoColumnFilter(this, FixRange(range));
 
             filter.Attach(this, columnFilterUI);
 
@@ -143,15 +143,15 @@ namespace unvell.ReoGrid
         {
             try
             {
-                this.controlAdapter.ChangeCursor(CursorStyle.Busy);
+                controlAdapter.ChangeCursor(CursorStyle.Busy);
 
-                this.SetRowsHeight(range.Row, range.Rows, r =>
+                SetRowsHeight(range.Row, range.Rows, r =>
                 {
-                    bool showRow = filter(r);
+                    var showRow = filter(r);
 
                     if (showRow)
                     {
-                        var rowhead = this.RetrieveRowHeader(r);
+                        var rowhead = RetrieveRowHeader(r);
 
                         // don't hide row, show the row
                         // if row is hidden, return lastHeight to show the row
@@ -165,13 +165,13 @@ namespace unvell.ReoGrid
             }
             finally
             {
-                if (this.controlAdapter != null)
+                if (controlAdapter != null)
                 {
-                    this.ControlAdapter.ChangeCursor(Interaction.CursorStyle.PlatformDefault);
+                    ControlAdapter.ChangeCursor(CursorStyle.PlatformDefault);
                 }
             }
 
-            this.RowsFiltered?.Invoke(this, null);
+            RowsFiltered?.Invoke(this, null);
         }
 
         /// <summary>
@@ -265,14 +265,23 @@ namespace unvell.ReoGrid
         {
             if (RangePosition.IsValidAddress(applyRange))
             {
-                return this.SortColumn(columnIndex, new RangePosition(applyRange), order, cellDataComparer);
+                return SortColumn(columnIndex, new RangePosition(applyRange), order, cellDataComparer);
             }
-            else if (this.TryGetNamedRangePosition(applyRange, out var range))
+            else if (TryGetNamedRangePosition(applyRange, out var range))
             {
-                return this.SortColumn(columnIndex, range, order, cellDataComparer);
+                return SortColumn(columnIndex, range, order, cellDataComparer);
             }
             else
                 throw new InvalidAddressException(applyRange);
+        }
+
+        public RangePosition SortColumn(int columnIndex, RangePosition applyRange,
+            SortOrder order = SortOrder.Ascending,
+            Func<object, object, int> cellDataComparer = null)
+        {
+            return SortColumn(new[] { columnIndex }, applyRange,
+                order,
+                cellDataComparer);
         }
 
         /// <summary>
@@ -284,38 +293,38 @@ namespace unvell.ReoGrid
         /// <param name="cellDataComparer">Custom cell data comparer, compares two cells and returns an integer. 
         /// Set this value to null to use default built-in comparer.</param>
         /// <returns>Data changed range.</returns>
-        public RangePosition SortColumn(int columnIndex, RangePosition applyRange,
-            SortOrder order = SortOrder.Ascending,
-            Func<object, object, int> cellDataComparer = null)
+        public RangePosition SortColumn(int[] columnIndex, RangePosition applyRange,
+        SortOrder order = SortOrder.Ascending,
+        Func<object, object, int> cellDataComparer = null)
         {
             var range = FixRange(applyRange);
             var oldToNewRowIndexDictionary = new Dictionary<int, int>();
 
-            RangePosition affectRange = RangePosition.Empty;
+            var affectRange = RangePosition.Empty;
 
             if (cellDataComparer != null)
             {
             }
 
 #if DEBUG
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 #endif // DEBUG
 
             // stop fire events
-            this.SuspendDataChangedEvents();
+            SuspendDataChangedEvents();
 
             try
             {
-                this.controlAdapter.ChangeCursor(CursorStyle.Busy);
+                controlAdapter.ChangeCursor(CursorStyle.Busy);
 
-                if (!this.CheckQuickSortRange(range.Row, range.EndRow, range.Col, range.EndCol))
+                if (!CheckQuickSortRange(range.Row, range.EndRow, range.Col, range.EndCol))
                 {
                     throw new InvalidOperationException("Cannot change a part of range, all cells should be having same colspan on column.");
                 }
 
-                IComparer<object> comparer = cellDataComparer == null ? (IComparer<object>)new CellComparer(order) : new CellComparerAdapter(cellDataComparer, order);
+                var comparer = cellDataComparer == null ? (IComparer<object>)new CellComparer(order) : new CellComparerAdapter(cellDataComparer, order);
 
-                var data = this.GetSortedData(columnIndex, range.Row, range.EndRow, range.Col, range.EndCol, ref affectRange, comparer, oldToNewRowIndexDictionary, order);
+                var data = GetSortedData(columnIndex, range.Row, range.EndRow, range.Col, range.EndCol, ref affectRange, comparer, oldToNewRowIndexDictionary, order);
 
                 DoAction(new SetSortedRangeDataAction(range, data));
 
@@ -331,18 +340,18 @@ namespace unvell.ReoGrid
             finally
             {
                 // resume to fire events
-                this.ResumeDataChangedEvents();
+                ResumeDataChangedEvents();
             }
 
-            this.RequestInvalidate();
+            RequestInvalidate();
 
-            this.controlAdapter.ChangeCursor(CursorStyle.PlatformDefault);
+            controlAdapter.ChangeCursor(CursorStyle.PlatformDefault);
 
             if (!affectRange.IsEmpty)
             {
-                for (int c = affectRange.Col; c <= affectRange.EndCol; c++)
+                for (var c = affectRange.Col; c <= affectRange.EndCol; c++)
                 {
-                    var header = this.cols[c];
+                    var header = cols[c];
 
                     if (header.Body != null)
                     {
@@ -350,9 +359,9 @@ namespace unvell.ReoGrid
                     }
                 }
 
-                this.RaiseRangeDataChangedEvent(affectRange);
+                RaiseRangeDataChangedEvent(affectRange);
 
-                this.RowsSorted?.Invoke(this, new Events.RowsSortedEventArgs(affectRange, oldToNewRowIndexDictionary));
+                RowsSorted?.Invoke(this, new Events.RowsSortedEventArgs(affectRange, oldToNewRowIndexDictionary));
             }
 
             return affectRange;
@@ -361,13 +370,13 @@ namespace unvell.ReoGrid
 
         private bool CheckQuickSortRange(int row, int endRow, int col, int endCol)
         {
-            for (int c = col; c <= endCol; c++)
+            for (var c = col; c <= endCol; c++)
             {
-                var cell1 = this.cells[row, c];
+                var cell1 = cells[row, c];
 
-                for (int r = row + 1; r <= endRow; r++)
+                for (var r = row + 1; r <= endRow; r++)
                 {
-                    var cell2 = this.cells[r, c];
+                    var cell2 = cells[r, c];
 
                     if (cell1 != null && cell2 != null
                         && ((cell1.IsValidCell && !cell2.IsValidCell)
@@ -381,7 +390,11 @@ namespace unvell.ReoGrid
             return true;
         }
 
-        private object[,] GetSortedData(int columnIndex, int startRow, int endRow, int startColumn,
+        private object[,] GetSortedData(
+            int[] columnsToSortIndexes,
+            int startRow,
+            int endRow,
+            int startColumn,
             int endColumn,
             ref RangePosition affectRange,
             IComparer<object> cellComparer,
@@ -395,8 +408,8 @@ namespace unvell.ReoGrid
                 affectRange.EndCol = endColumn;
             }
 
-            int affectedRangeStartRow = int.MaxValue;
-            int affectedRangeEndRow = int.MinValue;
+            var affectedRangeStartRow = int.MaxValue;
+            var affectedRangeEndRow = int.MinValue;
 
             var sortedData = new object[endRow - startRow + 1, endColumn - startColumn + 1];
 
@@ -408,11 +421,29 @@ namespace unvell.ReoGrid
                                              .ToArray()
                                      });
 
-            var columnRangeIndex = columnIndex - startColumn;
+            if (sortOrder == SortOrder.Ascending)
+            {
+                var sort = rangeData.OrderBy(x => x.Cells[columnsToSortIndexes[0] - startColumn]?.InnerData, cellComparer);
 
-            rangeData = sortOrder == SortOrder.Ascending
-                ? rangeData.OrderBy(x => x.Cells[columnRangeIndex]?.InnerData, cellComparer)
-                : rangeData.OrderByDescending(x => x.Cells[columnRangeIndex]?.InnerData, cellComparer);
+                for (var i = 1; i < columnsToSortIndexes.Length; i++)
+                {
+                    sort = sort.ThenBy(x => x.Cells[columnsToSortIndexes[i] - startColumn]?.InnerData, cellComparer);
+                }
+
+                rangeData = sort;
+
+            }
+            else
+            {
+                var sort = rangeData.OrderByDescending(x => x.Cells[columnsToSortIndexes[0] - startColumn]?.InnerData, cellComparer);
+
+                for (var i = 1; i < columnsToSortIndexes.Length; i++)
+                {
+                    sort = sort.ThenByDescending(x => x.Cells[columnsToSortIndexes[i] - startColumn]?.InnerData, cellComparer);
+                }
+
+                rangeData = sort;
+            }
 
             var ordered = rangeData.ToArray();
 
@@ -422,14 +453,16 @@ namespace unvell.ReoGrid
 
                 oldToNewRowIndex.Add(newRowIndex, orderedData.Cells[0].Row);
 
-                for (int col = 0; col < endColumn - startColumn + 1; col++)
+                for (var col = 0; col < endColumn - startColumn + 1; col++)
                 {
-                    var newCellData = orderedData.Cells[col]?.InnerData;
+                    var existingCell = orderedData.Cells[col];
 
-                    if (newCellData == null && cells[newRowIndex + startRow, col + startColumn]?.InnerData == null)
+                    if (existingCell == null && cells[newRowIndex + startRow, col + startColumn]?.InnerData == null)
                     {
                         continue;
                     }
+
+                    var newCellData = existingCell.InnerData;
 
                     sortedData[newRowIndex, col] = newCellData;
 
@@ -441,7 +474,7 @@ namespace unvell.ReoGrid
             affectRange.Row = affectedRangeStartRow == int.MaxValue ? 0 : affectedRangeStartRow;
             affectRange.EndRow = affectedRangeEndRow == int.MinValue ? 0 : affectedRangeEndRow;
 
-            bool canTrimData = !new RangePosition(startRow, startColumn, endRow - startRow + 1, endColumn - startColumn + 1).Equals(affectRange);
+            var canTrimData = !new RangePosition(startRow, startColumn, endRow - startRow + 1, endColumn - startColumn + 1).Equals(affectRange);
 
             return canTrimData
                 ? (object[,])ResizeArray(sortedData, new[] { affectRange.Rows, affectRange.Cols })
@@ -454,7 +487,7 @@ namespace unvell.ReoGrid
                 throw new ArgumentException("Array must have the same number of dimensions as there are elements in newSizes", nameof(newSizes));
 
             var newArray = Array.CreateInstance(arr.GetType().GetElementType(), newSizes);
-            int length = arr.Length <= newArray.Length ? arr.Length : newArray.Length;
+            var length = arr.Length <= newArray.Length ? arr.Length : newArray.Length;
             Array.ConstrainedCopy(arr, 0, newArray, 0, length);
             return newArray;
         }
